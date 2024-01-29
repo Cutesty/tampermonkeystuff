@@ -1,0 +1,45 @@
+// ==UserScript==
+// @name         Remove Unsafe Link Attributes
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  Remove "data-unsafe-link" and "data-unsafe-link-hostname" attributes from links
+// @author       Pascal
+// @match        *https://app.intercom.com/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    function removeUnsafeLinkAttributes() {
+        // Get all links on the page
+        var links = document.querySelectorAll('a[data-unsafe-link][data-unsafe-link-hostname]');
+
+        // Loop through each link and remove the specified attributes
+        links.forEach(function(link) {
+            link.removeAttribute('data-unsafe-link');
+            link.removeAttribute('data-unsafe-link-hostname');
+        });
+    }
+
+    // Wait for the DOM to be fully loaded
+    window.addEventListener('load', function() {
+        console.log('Script is running on the page.');
+
+        // Initial check after a short delay
+        setTimeout(removeUnsafeLinkAttributes, 1000);
+
+        // Use MutationObserver to detect changes in the DOM
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length || mutation.removedNodes.length) {
+                    removeUnsafeLinkAttributes();
+                }
+            });
+        });
+
+        // Configure and start the observer
+        observer.observe(document.body, { childList: true, subtree: true });
+    });
+
+})();
