@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Remove Unsafe Link Attributes
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  Remove "data-unsafe-link" and "data-unsafe-link-hostname" attributes from links
 // @author       Pascal
 // @match        *https://app.intercom.com/*
@@ -11,19 +11,30 @@
 (function() {
     'use strict';
 
-    function removeUnsafeLinkAttributes() {
-        // Get all links on the page
-        var links = document.querySelectorAll('a[data-unsafe-link][data-unsafe-link-hostname]');
 
-        // Loop through each link and remove the specified attributes
+    function processLinks() {
+        // Get all links on the page
+        var links = document.querySelectorAll('a');
+
+        // Loop through each link
         links.forEach(function(link) {
-            link.removeAttribute('data-unsafe-link');
-            link.removeAttribute('data-unsafe-link-hostname');
-        // Add event listener to handle click events
-            link.addEventListener('click', function(event) {
-                event.preventDefault(); // Prevent the default action (opening link in the current tab)
-                window.open(link.href, '_blank'); // Open the link in a new tab
-            });
+            // If the link contains the specified unsafe attributes, remove them
+            if (link.hasAttribute('data-unsafe-link') && link.hasAttribute('data-unsafe-link-hostname')) {
+                link.removeAttribute('data-unsafe-link');
+                link.removeAttribute('data-unsafe-link-hostname');
+                console.log('Removed unsafe attributes from link:', link.href);
+            }
+
+            // If the link doesn't already have an href attribute, set it with the link's text content
+            if (!link.hasAttribute('href')) {
+                var linkText = link.textContent.trim();
+                // Prepend "https://" if the link text doesn't already contain it
+                if (!linkText.startsWith('https://')) {
+                    linkText = 'https://' + linkText;
+                }
+                link.setAttribute('href', linkText);
+                console.log('Added href attribute with link text:', linkText);
+            }
         });
     }
 
@@ -31,14 +42,15 @@
     window.addEventListener('load', function() {
         console.log('Script is running on the page.');
 
-        // Initial check after a short delay
-        setTimeout(removeUnsafeLinkAttributes, 1000);
+        // Initial processing after a short delay
+        setTimeout(processLinks, 1000);
 
         // Use MutationObserver to detect changes in the DOM
         var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.addedNodes.length || mutation.removedNodes.length) {
-                    removeUnsafeLinkAttributes();
+                    console.log('DOM mutation detected. Processing links...');
+                    processLinks();
                 }
             });
         });
