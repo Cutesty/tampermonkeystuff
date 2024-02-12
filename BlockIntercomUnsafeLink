@@ -22,7 +22,6 @@
             if (link.hasAttribute('data-unsafe-link') && link.hasAttribute('data-unsafe-link-hostname')) {
                 link.removeAttribute('data-unsafe-link');
                 link.removeAttribute('data-unsafe-link-hostname');
-                console.log('Removed unsafe attributes from link:', link.href);
             }
 
             // If the link doesn't already have an href attribute, set it with the link's text content
@@ -33,14 +32,12 @@
                     linkText = 'https://' + linkText;
                 }
                 link.setAttribute('href', linkText);
-                console.log('Added href attribute with link text:', linkText);
             }
         });
     }
 
     // Wait for the DOM to be fully loaded
     window.addEventListener('load', function() {
-        console.log('Script is running on the page.');
 
         // Initial processing after a short delay
         setTimeout(processLinks, 1000);
@@ -49,7 +46,6 @@
         var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.addedNodes.length || mutation.removedNodes.length) {
-                    console.log('DOM mutation detected. Processing links...');
                     processLinks();
                 }
             });
