@@ -19,6 +19,11 @@
         links.forEach(function(link) {
             link.removeAttribute('data-unsafe-link');
             link.removeAttribute('data-unsafe-link-hostname');
+        // Add event listener to handle click events
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default action (opening link in the current tab)
+                window.open(link.href, '_blank'); // Open the link in a new tab
+            });
         });
     }
 
