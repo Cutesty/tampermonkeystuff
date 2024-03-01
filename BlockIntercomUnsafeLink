@@ -4,7 +4,7 @@
 // @version      0.3
 // @description  Remove "data-unsafe-link" and "data-unsafe-link-hostname" attributes from links
 // @author       Pascal
-// @match        https://app.intercom.com/a/inbox/*/inbox/view/*/conversation/*
+// @match        https://app.intercom.com/a/inbox/*
 // @grant        none
 // ==/UserScript==
 
