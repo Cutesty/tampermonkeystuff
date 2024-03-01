@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Remove Unsafe Link Attributes
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Remove "data-unsafe-link" and "data-unsafe-link-hostname" attributes from links
 // @author       Pascal
-// @match        *https://app.intercom.com/*
+// @match        https://app.intercom.com/a/inbox/*/inbox/view/*/conversation/*
 // @grant        none
 // ==/UserScript==
 
@@ -13,28 +13,45 @@
 
 
     function processLinks() {
-        // Get all links on the page
-        var links = document.querySelectorAll('a');
+    // Get all links on the page
+    var links = document.querySelectorAll('a');
 
-        // Loop through each link
-        links.forEach(function(link) {
-            // If the link contains the specified unsafe attributes, remove them
-            if (link.hasAttribute('data-unsafe-link') && link.hasAttribute('data-unsafe-link-hostname')) {
-                link.removeAttribute('data-unsafe-link');
-                link.removeAttribute('data-unsafe-link-hostname');
-            }
+    // Loop through each link
+    links.forEach(function(link) {
+        // If the link contains the specified unsafe attributes, remove them
+        if (link.hasAttribute('data-unsafe-link') && link.hasAttribute('data-unsafe-link-hostname')) {
+            link.removeAttribute('data-unsafe-link');
+            link.removeAttribute('data-unsafe-link-hostname');
+        }
 
-            // If the link doesn't already have an href attribute, set it with the link's text content
-            if (!link.hasAttribute('href')) {
-                var linkText = link.textContent.trim();
-                // Prepend "https://" if the link text doesn't already contain it
-                if (!linkText.startsWith('https://')) {
-                    linkText = 'https://' + linkText;
-                }
-                link.setAttribute('href', linkText);
+        // If the link doesn't already have an href attribute, set it with the link's text content
+        if (!link.hasAttribute('href')) {
+            var linkText = link.textContent.trim();
+            // Prepend "https://" if the link text doesn't already contain it
+            if (!linkText.startsWith('https://')) {
+                linkText = 'https://' + linkText;
             }
-        });
-    }
+            link.setAttribute('href', linkText);
+        }
+
+         // If the link has class "external-link"
+        if (link.classList.contains('external-link')) {
+            // Get the original href attribute
+            var originalHref = link.getAttribute('href');
+
+            // Extract the value of the href query parameter
+            var match = originalHref.match(/href=([^&]+)/);
+            if (match) {
+                // Decode the URL and set it as the href attribute
+                var newHref = decodeURIComponent(match[1]);
+                link.setAttribute('href', newHref);
+
+                // Set the text content of the link to match the new href
+                link.textContent = newHref;
+            }
+        }
+    });
+}
 
     // Wait for the DOM to be fully loaded
     window.addEventListener('load', function() {
