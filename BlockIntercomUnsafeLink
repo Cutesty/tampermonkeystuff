@@ -43,7 +43,7 @@
             var match = originalHref.match(/href=([^&]+)/);
             if (match) {
                 // Decode the URL and set it as the href attribute
-                var newHref = decodeURIComponent(match[1]);
+                var newHref = link.innerText;
                 link.setAttribute('href', newHref);
 
                 // Set the text content of the link to match the new href
